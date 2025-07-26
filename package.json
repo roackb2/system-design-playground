@@ -1,9 +1,13 @@
 {
   "name": "system-design-playground",
   "version": "1.0.0",
-  "description": "",
+  "description": "Playground to put random things here when learning system design",
   "license": "ISC",
   "author": "Jay / Fienna Liang (roackb2@gmail.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/roackb2/system-design-playground"
+  },
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
