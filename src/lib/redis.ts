@@ -1,6 +1,7 @@
 import { createClient } from 'redis';
 import logger from '@/lib/logger';
 import { sleep } from '@/lib/utils';
+import { PROJ_NS_PREFIX_REDIS } from '@/lib/constants';
 
 export type RedisClientType = ReturnType<typeof createClient>;
 export type RedisClientOptions = Parameters<typeof createClient>[0];
@@ -10,8 +11,13 @@ const redisClientFactory = (options: RedisClientOptions): RedisClientType => {
 };
 
 export const initRedis = async () => {
-  const redisClient = redisClientFactory({});
-  redisClient.on("error", (err: unknown) => console.log("Redis Client Error", err))
+  const options: RedisClientOptions = {
+    url: process.env.REDIS_URL,
+    database: parseInt(process.env.REDIS_DATABASE ?? '0')
+  }
+  logger.info(`Initializing redis with config: ${JSON.stringify(options, null, 2)}`)
+  const redisClient = redisClientFactory(options);
+  redisClient.on("error", (err: unknown) => logger.error("Redis Client Error", err))
 
   await redisClient.connect();
 
@@ -23,3 +29,5 @@ export const initRedis = async () => {
 
   return redisClient;
 }
+
+export const getKey = (key: string) => `${PROJ_NS_PREFIX_REDIS}:${key}`;
