@@ -14,11 +14,14 @@
     "build": "rm -rf dist && tsc",
     "start": "node dist/src/server.js",
     "typecheck": "tsc --noEmit",
-    "worker:onboarding:dev": "tsx watch src/workers/onboarding/OnboardingApplicationWorker | pino-pretty"
+    "worker:onboarding:dev": "tsx watch src/workers/onboarding/OnboardingApplicationWorker | pino-pretty",
+    "test:load": "k6 run tests/load/index.ts"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
+    "@types/k6": "^1.2.0",
     "@types/node": "^24.1.0",
+    "k6": "^0.0.0",
     "pino-pretty": "^13.0.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
