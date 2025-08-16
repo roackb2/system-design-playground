@@ -1,4 +1,4 @@
-import { RedisClientType } from "@/lib/redis";
+import { RedisClientType } from "@/integrations/redis";
 import { QueueItem, QueuePort } from "./QueuePort";
 import logger from "@/lib/logger";
 
@@ -35,7 +35,7 @@ export class RedisQueueAdapter implements QueuePort {
       const item = await this.redisClient.brPop(this.QueueName, Infinity);
 
       if (!item) {
-        logger.info(`${this.name}: Queue empty while pop`);
+        logger.info(`${this.name}: Queue empty while dequeue`);
         return null;
       }
 

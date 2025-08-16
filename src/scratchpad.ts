@@ -1,4 +1,4 @@
-import { getKey, RedisClientType } from "@/lib/redis";
+import { getKey, RedisClientType } from "@/integrations/redis";
 import logger from "@/lib/logger";
 
 const playWithString = async (redisClient: RedisClientType) => {
