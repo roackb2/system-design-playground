@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import logger from './lib/logger';
+import logger from '../../lib/logger';
 import { initRedis } from '@/integrations/redis';
-import { playRoundBasicRedisOps } from '@/scratchpad';
+import { playRoundBasicRedisOps } from 'scripts/playground/redis/scratchpad';
 
 const init = async () => {
   const redisClient = await initRedis();
