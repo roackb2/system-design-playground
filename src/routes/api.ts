@@ -1,8 +1,18 @@
+import { QueuePort } from '@/infra/queue/QueuePort';
 import { Router } from "express";
-import onboardingRouter from "./onboarding/OnboardingRoutes";
+import { getOnboardingRouter } from "./onboarding/OnboardingRoutes";
 
-const apiRouter = Router();
+export const getApiRouter = ({
+  queue
+}: {
+  queue: QueuePort
+}) => {
+  const apiRouter = Router();
 
-apiRouter.use('/onboarding',onboardingRouter);
+  const onboardingRouter = getOnboardingRouter(queue);
 
-export default apiRouter;
+  apiRouter.use('/onboarding',onboardingRouter);
+
+  return apiRouter;
+}
+

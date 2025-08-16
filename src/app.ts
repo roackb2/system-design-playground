@@ -1,9 +1,19 @@
 import express from 'express';
-import apiRouter from './routes/api';
+import { getApiRouter } from './routes/api';
+import { QueuePort } from './infra/queue/QueuePort';
 
-const app = express();
+export const getMainApp = ({
+  queue
+}: {
+  queue: QueuePort
+}) => {
+  const app = express();
 
-app.use(express.json()) // for parsing application/json
-app.use('/api/v1', apiRouter);
+  const apiRouter = getApiRouter({ queue });
 
-export default app;
+  app.use(express.json()) // for parsing application/json
+  app.use('/api/v1', apiRouter);
+
+  return app;
+}
+

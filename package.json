@@ -12,7 +12,9 @@
   "scripts": {
     "dev": "tsx watch src/server.ts | pino-pretty",
     "build": "rm -rf dist && tsc",
-    "start": "node dist/src/server.js"
+    "start": "node dist/src/server.js",
+    "typecheck": "tsc --noEmit",
+    "worker:onboarding:dev": "tsx watch src/workers/onboarding/OnboardingApplicationWorker | pino-pretty"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",

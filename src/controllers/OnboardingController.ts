@@ -1,10 +1,21 @@
+import { QueuePort } from "@/infra/queue/QueuePort";
 import logger from "@/lib/logger";
 import { OnboardingApplicationSchema } from "@/services/onboarding/OnboardingApplication.types";
 import { OnboardingService } from "@/services/onboarding/OnboardingService";
 import { Request, Response } from "express";
 
 export class OnboardingController {
-  static handleApplicationSubmit(req: Request, res: Response) {
+  private onboardingService: OnboardingService;
+
+  constructor(queue: QueuePort) {
+    this.onboardingService = new OnboardingService(queue);
+  }
+
+  private get name() {
+    return OnboardingController.name;
+  }
+
+  async handleApplicationSubmit(req: Request, res: Response) {
     logger.info(`${this.name}: Handle submit request: ${JSON.stringify(req.body)}`)
 
     const parseRes = OnboardingApplicationSchema.safeParse(req.body);
@@ -17,7 +28,7 @@ export class OnboardingController {
       return;
     }
 
-    const result = OnboardingService.handleApplicationSubmit(parseRes.data)
+    const result = this.onboardingService.handleApplicationSubmit(parseRes.data)
 
     res.json(result);
   }

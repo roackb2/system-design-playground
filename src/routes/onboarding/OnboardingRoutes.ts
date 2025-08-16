@@ -1,8 +1,14 @@
 import  { Router } from 'express';
 import { OnboardingController } from '@/controllers/OnboardingController';
+import { QueuePort } from '@/infra/queue/QueuePort';
 
-const onboardingRouter = Router();
+export const getOnboardingRouter = (queue: QueuePort) => {
+  const onboardingRouter = Router();
 
-onboardingRouter.post('/submit', OnboardingController.handleApplicationSubmit.bind(OnboardingController));
+  const onboardingController = new OnboardingController(queue);
 
-export default onboardingRouter
+  onboardingRouter.post('/submit', onboardingController.handleApplicationSubmit.bind(onboardingController));
+
+  return onboardingRouter
+}
+

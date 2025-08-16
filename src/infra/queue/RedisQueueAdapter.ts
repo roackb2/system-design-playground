@@ -5,18 +5,20 @@ import logger from "@/lib/logger";
 export class RedisQueueAdapter implements QueuePort {
   private static QueueName = 'sdp:queue';
 
+  private static ConsumerTimeout = 24 * 60 * 60;
+
   private redisClient: RedisClientType;
 
   constructor(redisClient: RedisClientType) {
     this.redisClient = redisClient;
   }
 
-  private get QueueName () {
-    return RedisQueueAdapter.QueueName;
-  }
-
   private get name() {
     return RedisQueueAdapter.name;
+  }
+
+  private get QueueName () {
+    return RedisQueueAdapter.QueueName;
   }
 
   async enqueue (item: QueueItem): Promise<boolean> {
@@ -32,7 +34,10 @@ export class RedisQueueAdapter implements QueuePort {
 
   async dequeue (): Promise<QueueItem | null> {
     try {
-      const item = await this.redisClient.brPop(this.QueueName, Infinity);
+      const item = await this.redisClient.brPop(
+        RedisQueueAdapter.QueueName,
+        RedisQueueAdapter.ConsumerTimeout
+      );
 
       if (!item) {
         logger.info(`${this.name}: Queue empty while dequeue`);
