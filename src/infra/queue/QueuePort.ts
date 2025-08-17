@@ -5,6 +5,6 @@ export interface QueueItem {
 }
 
 export abstract class QueuePort {
-  abstract enqueue(item: QueueItem): Promise<boolean>;
-  abstract dequeue(): Promise<QueueItem | null>;
+  abstract enqueue(queueName: string, item: QueueItem): Promise<boolean>;
+  abstract dequeue(queueName: string): Promise<QueueItem | null>;
 }

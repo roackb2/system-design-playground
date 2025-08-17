@@ -1,5 +1,5 @@
 import logger from "@/lib/logger";
-import { OnboardingApplicationProcessResultType, OnboardingApplicationType } from "./OnboardingApplication.types";
+import { OnboardingApplicationProcessResultType, OnboardingApplicationQueueName, OnboardingApplicationType } from "./OnboardingApplication.types";
 import { QueueItem, QueuePort } from "@/infra/queue/QueuePort";
 
 export class OnboardingService {
@@ -24,7 +24,8 @@ export class OnboardingService {
         payload: application
       }
 
-      await this.queue.enqueue(queueItem);
+      console.log('OnboardingApplicationQueueName', OnboardingApplicationQueueName)
+      await this.queue.enqueue(OnboardingApplicationQueueName, queueItem);
 
       return { success: true };
     } catch (err: unknown) {

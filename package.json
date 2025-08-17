@@ -14,13 +14,16 @@
     "build": "rm -rf dist && tsc",
     "start": "node dist/src/server.js",
     "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
     "worker:onboarding:dev": "tsx watch src/workers/onboarding/OnboardingApplicationWorker | pino-pretty",
-    "test:load": "k6 run tests/load/index.ts"
+    "test:load": "k6 run --out influxdb=http://localhost:8086/k6 tests/load/index.ts"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/k6": "^1.2.0",
     "@types/node": "^24.1.0",
+    "drizzle-kit": "^0.31.4",
     "k6": "^0.0.0",
     "pino-pretty": "^13.0.0",
     "tsx": "^4.20.3",
@@ -28,7 +31,9 @@
   },
   "dependencies": {
     "dotenv": "^17.2.1",
+    "drizzle-orm": "^0.44.4",
     "express": "^5.1.0",
+    "pg": "^8.16.3",
     "pino": "^9.7.0",
     "redis": "^5.6.1",
     "zod": "^4.0.17"

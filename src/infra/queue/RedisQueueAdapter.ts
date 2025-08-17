@@ -3,11 +3,9 @@ import { QueueItem, QueuePort } from "./QueuePort";
 import logger from "@/lib/logger";
 
 export class RedisQueueAdapter implements QueuePort {
-  private static QueueName = 'sdp:queue';
-
-  private static ConsumerTimeout = 24 * 60 * 60;
-
   private redisClient: RedisClientType;
+
+  private QueueName = 'sdp:queue';
 
   constructor(redisClient: RedisClientType) {
     this.redisClient = redisClient;
@@ -17,14 +15,17 @@ export class RedisQueueAdapter implements QueuePort {
     return RedisQueueAdapter.name;
   }
 
-  private get QueueName () {
-    return RedisQueueAdapter.QueueName;
+
+  private getQueueName(queueName: string): string {
+    return `${this.QueueName}:${queueName}`
   }
 
-  async enqueue (item: QueueItem): Promise<boolean> {
+  async enqueue (queueName: string, item: QueueItem): Promise<boolean> {
     try {
-      const res = await this.redisClient.lPush(this.QueueName, JSON.stringify(item));
-      logger.info(`${this.name}: enqueue item ${item.id} into queue, queue length: ${res}`)
+      const key = this.getQueueName(queueName)
+      logger.info(`${this.name} Enqueuing item into queue ${key}`)
+      const res = await this.redisClient.lPush(key, JSON.stringify(item));
+      logger.info(`${this.name} Enqueue item ${item.id} into queue, queue length: ${res}`)
       return true;
     } catch (err: unknown) {
       logger.error(`${this.name} Error enqueue item with id: ${item.id}, error: ${err}`);
@@ -32,15 +33,14 @@ export class RedisQueueAdapter implements QueuePort {
     }
   }
 
-  async dequeue (): Promise<QueueItem | null> {
+  async dequeue (queueName: string): Promise<QueueItem | null> {
     try {
-      const item = await this.redisClient.brPop(
-        RedisQueueAdapter.QueueName,
-        RedisQueueAdapter.ConsumerTimeout
-      );
+      const key = this.getQueueName(queueName)
+      logger.info(`${this.name} Waiting for queue item in ${key}`)
+      const item = await this.redisClient.brPop(key, 0);
 
       if (!item) {
-        logger.info(`${this.name}: Queue empty while dequeue`);
+        logger.warn(`${this.name}: Queue empty while dequeue`);
         return null;
       }
 

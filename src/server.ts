@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { getMainApp } from './app'
 import { RedisQueueAdapter } from './infra/queue';
 import { initRedis } from './integrations/redis';

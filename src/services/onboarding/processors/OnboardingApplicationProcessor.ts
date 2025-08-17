@@ -1,6 +1,7 @@
 import { QueuePort } from "@/infra/queue/QueuePort";
-import { OnboardingApplicationSchema, OnboardingApplicationType } from "../OnboardingApplication.types";
+import { OnboardingApplicationQueueName, OnboardingApplicationSchema, OnboardingApplicationType } from "../OnboardingApplication.types";
 import logger from "@/lib/logger";
+import OnboardingRepository from "../OnboardingRepository";
 
 
 export class OnboardingApplicationProcessor {
@@ -16,9 +17,11 @@ export class OnboardingApplicationProcessor {
 
   public async run () {
     while (true) {
+      console.log('loop iteration')
       // Handle error while processing each item separately
       try {
-        const item = await this.queue.dequeue()
+        const item = await this.queue.dequeue(OnboardingApplicationQueueName)
+        console.log(item)
 
         if (!item) {
           logger.warn(`Queue item empty`);
@@ -35,7 +38,7 @@ export class OnboardingApplicationProcessor {
           throw new Error(`Invalid application format: ${parsedItem.error}`)
         }
 
-        this.processApplication(parsedItem.data);
+        await this.processApplication(parsedItem.data);
       } catch (err: unknown) {
         logger.error(`${this.name} Error processing application: ${err}`)
         // Don't throw, keep processing next item;
@@ -47,9 +50,25 @@ export class OnboardingApplicationProcessor {
   private async processApplication (application: OnboardingApplicationType) {
     const { companyName } = application
     logger.info(`${this.name} Processing application: ${companyName}`)
+    const savedOnboarding = await this.saveApplication(application);
     const companyInfo = await this.getCompanyInfo(companyName);
     const report = await this.getCreditReport(companyInfo.id);
-    logger.info(`${this.name} Done processing onboarding application for company ${companyInfo.id}, report: ${JSON.stringify(report)}`);
+    logger.info(`${this.name} Done processing onboarding application for company ${savedOnboarding.company.id}, application: ${savedOnboarding.application.id} , report: ${JSON.stringify(report)}`);
+  }
+
+  private async saveApplication(application: OnboardingApplicationType) {
+    const { companyName } = application;
+    logger.info(`${this.name} Saving application: ${companyName}`)
+    const savedCompany = await OnboardingRepository.saveCompany({
+      name: companyName
+    })
+    const savedApplication = await OnboardingRepository.saveOnboardingApplication({
+      companyId: savedCompany.id,
+    })
+    return {
+      company: savedCompany,
+      application: savedApplication
+    }
   }
 
   private getCompanyInfo(companyName: string) {
