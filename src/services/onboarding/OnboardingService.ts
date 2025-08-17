@@ -24,7 +24,6 @@ export class OnboardingService {
         payload: application
       }
 
-      console.log('OnboardingApplicationQueueName', OnboardingApplicationQueueName)
       await this.queue.enqueue(OnboardingApplicationQueueName, queueItem);
 
       return { success: true };

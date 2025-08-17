@@ -18,10 +18,18 @@ export class OnboardingController {
   async handleApplicationSubmit(req: Request, res: Response) {
     logger.info(`${this.name}: Handle submit request: ${JSON.stringify(req.body)}`)
 
+    if (!req.body) {
+      res.status(400).json({
+        error: 'Empty application',
+        message: 'The request body has no value'
+      })
+      return;
+    }
+
     const parseRes = OnboardingApplicationSchema.safeParse(req.body);
 
     if (!parseRes.success || !parseRes.data) {
-      res.json({
+      res.status(400).json({
         error: 'Invalid application',
         message: parseRes.error
       })

@@ -18,13 +18,19 @@ export const options = {
 
 export default function () {
   group('Process onboarding', function() {
-    const data = { companyName: `Test Company ${crypto.randomUUID().slice(0, 4)}` }
-    let res = http.post('http://localhost:3300/api/v1/onboarding/submit', data)
+    const url = 'http://localhost:3300/api/v1/onboarding/submit'
+    const data = JSON.stringify({ companyName: `Test Company ${crypto.randomUUID().slice(0, 4)}` })
+    const params = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    let res = http.post(url, data, params)
 
     check(res, { 'success login': (r) => r.status === 200 })
 
     avgDuration.add(res.timings.duration);
 
-    sleep(0.1)
+    sleep(0.3)
   })
 }

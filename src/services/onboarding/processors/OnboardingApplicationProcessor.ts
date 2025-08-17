@@ -17,11 +17,9 @@ export class OnboardingApplicationProcessor {
 
   public async run () {
     while (true) {
-      console.log('loop iteration')
       // Handle error while processing each item separately
       try {
         const item = await this.queue.dequeue(OnboardingApplicationQueueName)
-        console.log(item)
 
         if (!item) {
           logger.warn(`Queue item empty`);

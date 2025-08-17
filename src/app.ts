@@ -11,7 +11,10 @@ export const getMainApp = ({
 
   const apiRouter = getApiRouter({ queue });
 
-  app.use(express.json()) // for parsing application/json
+  // for parsing application/json
+  app.use(express.json())
+  // For parsing application/x-www-form-urlencoded
+  app.use(express.urlencoded({ extended: true }));
   app.use('/api/v1', apiRouter);
 
   return app;
