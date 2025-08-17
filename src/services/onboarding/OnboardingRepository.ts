@@ -21,6 +21,7 @@ export default class OnboardingRepository implements OnboardingPort {
       purpose,
       industry,
     } = application
+    logger.info(`${this.name}: Saving application for company ${companyName}, taxId: ${taxId}`)
     const companyPayload: typeof companyTable.$inferInsert = {
       name: companyName,
       taxId
@@ -53,6 +54,8 @@ export default class OnboardingRepository implements OnboardingPort {
       ...savedApplication.content,
     }
 
+    logger.info(`${this.name} Application saved: ${storedApplication.id}`)
+
     return storedApplication
   }
 
@@ -84,6 +87,7 @@ export default class OnboardingRepository implements OnboardingPort {
     applicationId: number;
     creditReport: OnboardingCreditReportType;
   }): Promise<void> {
+    logger.info(`${this.name} Updating credit report for application: ${applicationId}`)
     const existingApplication = await db.query.onboardingApplicationTable.findFirst({
       where: eq(onboardingApplicationTable.id, applicationId)
     });
@@ -101,11 +105,13 @@ export default class OnboardingRepository implements OnboardingPort {
     }
 
     await db.update(onboardingApplicationTable).set(payload)
+    logger.info(`${this.name} Updated credit report for application: ${applicationId}`)
   }
 
   private async saveCompany(
     company: typeof companyTable.$inferInsert
   ): Promise<typeof companyTable.$inferSelect> {
+    logger.info(`${this.name}: Saving company for ${company.name}`)
     const existingCompany = await db.query.companyTable.findFirst({
       where: or(
         eq(companyTable.name, company.name),
@@ -122,6 +128,7 @@ export default class OnboardingRepository implements OnboardingPort {
       .insert(companyTable)
       .values(company)
       .returning();
+    logger.info(`${this.name}: Company saved for ${company.name}`)
 
     return savedCompany;
   }

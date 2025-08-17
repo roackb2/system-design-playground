@@ -14,7 +14,7 @@ export enum Industry {
 }
 
 export const OnboardingApplicationFormSchema = z.object({
-  companyName: z.string().min(1).max(20).describe('The legal company name'),
+  companyName: z.string().min(1).max(50).describe('The legal company name'),
   taxId: z.string().min(9).max(9).describe('The Tax ID of the registered company'),
   industry: z.enum(Industry).describe('The industry that the company belongs to'),
   purpose: z.string().min(10).max(1000).describe('The purpose for overall loan applications')

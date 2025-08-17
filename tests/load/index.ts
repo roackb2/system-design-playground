@@ -1,6 +1,7 @@
 import http from 'k6/http'
 import { check, sleep, group } from 'k6'
 import { Trend } from 'k6/metrics';
+import faker from 'k6/x/faker';
 
 let avgDuration = new Trend('avg_duration');
 
@@ -19,7 +20,12 @@ export const options = {
 export default function () {
   group('Process onboarding', function() {
     const url = 'http://localhost:3300/api/v1/onboarding/submit'
-    const data = JSON.stringify({ companyName: `Test Company ${crypto.randomUUID().slice(0, 4)}` })
+    const data = JSON.stringify({
+      companyName: `Test Company ${faker.strings.uuid()}`,
+      taxId: faker.strings.numerify('#########'),
+      industry: 'finance',
+      purpose: 'For testing'
+    })
     const params = {
       headers: {
         'Content-Type': 'application/json',
@@ -31,6 +37,6 @@ export default function () {
 
     avgDuration.add(res.timings.duration);
 
-    sleep(0.3)
+    sleep(1)
   })
 }

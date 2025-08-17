@@ -17,7 +17,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "worker:onboarding:dev": "tsx watch src/workers/onboarding/OnboardingApplicationWorker | pino-pretty",
-    "test:load": "k6 run --out influxdb=http://localhost:8086/k6 tests/load/index.ts"
+    "install:k6": "./scripts/build_k6.sh",
+    "test:load": "./bin/k6 run --out influxdb=http://localhost:8086/k6 tests/load/index.ts"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",

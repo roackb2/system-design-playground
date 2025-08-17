@@ -31,7 +31,9 @@
     // "moduleResolution": "node10",                     /* Specify how TypeScript looks up a file from a given module specifier. */
     "baseUrl": ".",                                  /* Specify the base directory to resolve non-relative module names. */
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      // for faker to work in k6 in editor
+      "k6/x/faker": ["./tests/load/types/xk6-faker.d.ts"],
     },                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
     "rootDirs": ["./src", "./tests", "./scripts",],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */

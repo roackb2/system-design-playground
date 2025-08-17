@@ -40,7 +40,8 @@ export class OnboardingApplicationProcessor {
 
         const { payload } = item
 
-        await this.processApplication(payload.applicationId);
+        // NOTE: Don't await so we can process concurrently
+        this.processApplication(payload.applicationId);
       } catch (err: unknown) {
         logger.error(`${this.name} Error processing application: ${err}`)
         // Don't throw, keep processing next item;
