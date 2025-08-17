@@ -1,14 +1,24 @@
+import { OnboardingApplicationQueuePayloadType, OnboardingApplicationWithRiskReportType, OnboardingCreditReportType, OnboardingRiskLevel } from './../OnboardingApplication.types';
 import { QueuePort } from "@/infra/queue/QueuePort";
-import { OnboardingApplicationQueueName, OnboardingApplicationSchema, OnboardingApplicationType } from "../OnboardingApplication.types";
+import { OnboardingApplicationQueueName, OnboardingApplicationFormSchema, OnboardingApplicationType } from "../OnboardingApplication.types";
 import logger from "@/lib/logger";
-import OnboardingRepository from "../OnboardingRepository";
+import { OnboardingPort } from "../OnboardingPort";
 
 
 export class OnboardingApplicationProcessor {
   private queue: QueuePort;
 
-  constructor (queue: QueuePort) {
+  private repository: OnboardingPort;
+
+  constructor ({
+    queue,
+    repository
+  }: {
+    queue: QueuePort,
+    repository: OnboardingPort
+  }) {
     this.queue = queue;
+    this.repository = repository;
   }
 
   private get name() {
@@ -19,7 +29,7 @@ export class OnboardingApplicationProcessor {
     while (true) {
       // Handle error while processing each item separately
       try {
-        const item = await this.queue.dequeue(OnboardingApplicationQueueName)
+        const item = await this.queue.dequeue<OnboardingApplicationQueuePayloadType>(OnboardingApplicationQueueName)
 
         if (!item) {
           logger.warn(`Queue item empty`);
@@ -30,13 +40,7 @@ export class OnboardingApplicationProcessor {
 
         const { payload } = item
 
-        const parsedItem = OnboardingApplicationSchema.safeParse(payload);
-        if (!parsedItem.success || !parsedItem.data) {
-          // TODO: Use domain specific error type
-          throw new Error(`Invalid application format: ${parsedItem.error}`)
-        }
-
-        await this.processApplication(parsedItem.data);
+        await this.processApplication(payload.applicationId);
       } catch (err: unknown) {
         logger.error(`${this.name} Error processing application: ${err}`)
         // Don't throw, keep processing next item;
@@ -45,48 +49,37 @@ export class OnboardingApplicationProcessor {
     }
   }
 
-  private async processApplication (application: OnboardingApplicationType) {
-    const { companyName } = application
-    logger.info(`${this.name} Processing application: ${companyName}`)
-    const savedOnboarding = await this.saveApplication(application);
-    const companyInfo = await this.getCompanyInfo(companyName);
-    const report = await this.getCreditReport(companyInfo.id);
-    logger.info(`${this.name} Done processing onboarding application for company ${savedOnboarding.company.id}, application: ${savedOnboarding.application.id} , report: ${JSON.stringify(report)}`);
+  private async processApplication (applicationId: number) {
+    logger.info(`${this.name}: Processing application: ${applicationId}`)
+    const application = await this.repository.getApplicationById(applicationId)
+    const companyInfo = await this.getCompanyInfo(application.taxId);
+    // TODO: update application with detail company info
+    const report = await this.getCreditReport(application.companyId);
+    await this.repository.updateApplicationWithCreditReport({
+      applicationId: application.id,
+      creditReport: report
+    })
+    logger.info(`${this.name} Done processing onboarding application: ${application.id} , report: ${JSON.stringify(report)}`);
   }
 
-  private async saveApplication(application: OnboardingApplicationType) {
-    const { companyName } = application;
-    logger.info(`${this.name} Saving application: ${companyName}`)
-    const savedCompany = await OnboardingRepository.saveCompany({
-      name: companyName
-    })
-    const savedApplication = await OnboardingRepository.saveOnboardingApplication({
-      companyId: savedCompany.id,
-    })
-    return {
-      company: savedCompany,
-      application: savedApplication
-    }
-  }
-
-  private getCompanyInfo(companyName: string) {
+  private async getCompanyInfo(taxId: string) {
     // TODO: Get company information from external source.
-    logger.info(`${this.name} Getting company info for ${companyName}`)
-    const info = {}
-    return {
-      ...info,
-      companyName,
-      id: 0,
+    logger.info(`${this.name} Getting company info for company with Tax ID: ${taxId}`)
+    await new Promise((resolve) => setTimeout(resolve, 200))
+    const info = {
+      websiteUrl: 'https://bood_biz.com'
     }
+    return info
   }
 
-  private getCreditReport(companyId: number) {
+  private async getCreditReport(companyId: number): Promise<OnboardingCreditReportType> {
     // TODO: Get company credit report from auditing services.
     logger.info(`${this.name} Getting credit report for ${companyId}`)
+    // simulate getting report from external service
+    await new Promise((resolve) => setTimeout(resolve, 200))
     return {
-      score: '4.5',
-      riskLevel: 'low',
+      score: 4.5,
+      riskLevel: OnboardingRiskLevel.Low,
     }
   }
-
 }

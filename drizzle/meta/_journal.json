@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1755404117145,
-      "tag": "0000_soft_paibok",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1755408091853,
-      "tag": "0001_abandoned_winter_soldier",
+      "when": 1755417007066,
+      "tag": "0000_burly_energizer",
       "breakpoints": true
     }
   ]

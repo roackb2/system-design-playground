@@ -1,10 +1,10 @@
 
-export interface QueueItem {
+export interface QueueItem<T extends Record<string, any>> {
   id: string;
-  payload: Record<string, any>
+  payload: T
 }
 
 export abstract class QueuePort {
-  abstract enqueue(queueName: string, item: QueueItem): Promise<boolean>;
-  abstract dequeue(queueName: string): Promise<QueueItem | null>;
+  abstract enqueue<T extends Record<string, any>>(queueName: string, item: QueueItem<T>): Promise<boolean>;
+  abstract dequeue<T extends Record<string, any>>(queueName: string): Promise<QueueItem<T> | null>;
 }

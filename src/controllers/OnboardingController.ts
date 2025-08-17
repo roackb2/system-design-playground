@@ -1,14 +1,24 @@
 import { QueuePort } from "@/infra/queue/QueuePort";
 import logger from "@/lib/logger";
-import { OnboardingApplicationSchema } from "@/services/onboarding/OnboardingApplication.types";
+import { OnboardingApplicationFormSchema } from "@/services/onboarding/OnboardingApplication.types";
+import OnboardingRepository from "@/services/onboarding/OnboardingRepository";
 import { OnboardingService } from "@/services/onboarding/OnboardingService";
 import { Request, Response } from "express";
 
 export class OnboardingController {
   private onboardingService: OnboardingService;
 
-  constructor(queue: QueuePort) {
-    this.onboardingService = new OnboardingService(queue);
+  constructor({
+    queue,
+    repository
+  }: {
+    queue: QueuePort,
+    repository: OnboardingRepository,
+  }) {
+    this.onboardingService = new OnboardingService({
+      queue,
+      repository
+    });
   }
 
   private get name() {
@@ -26,7 +36,7 @@ export class OnboardingController {
       return;
     }
 
-    const parseRes = OnboardingApplicationSchema.safeParse(req.body);
+    const parseRes = OnboardingApplicationFormSchema.safeParse(req.body);
 
     if (!parseRes.success || !parseRes.data) {
       res.status(400).json({
@@ -36,7 +46,7 @@ export class OnboardingController {
       return;
     }
 
-    const result = this.onboardingService.handleApplicationSubmit(parseRes.data)
+    const result = await this.onboardingService.handleApplicationSubmit(parseRes.data)
 
     res.json(result);
   }

@@ -20,7 +20,7 @@ export class RedisQueueAdapter implements QueuePort {
     return `${this.QueueName}:${queueName}`
   }
 
-  async enqueue (queueName: string, item: QueueItem): Promise<boolean> {
+  async enqueue<T extends Record<string, any>>(queueName: string, item: QueueItem<T>): Promise<boolean> {
     try {
       const key = this.getQueueName(queueName)
       logger.info(`${this.name} Enqueuing item into queue ${key}`)
@@ -33,7 +33,7 @@ export class RedisQueueAdapter implements QueuePort {
     }
   }
 
-  async dequeue (queueName: string): Promise<QueueItem | null> {
+  async dequeue<T extends Record<string, any>>(queueName: string): Promise<QueueItem<T> | null> {
     try {
       const key = this.getQueueName(queueName)
       logger.info(`${this.name} Waiting for queue item in ${key}`)
