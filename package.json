@@ -19,7 +19,9 @@
     "worker:onboarding:dev": "tsx watch src/workers/onboarding/OnboardingApplicationWorker | pino-pretty",
     "install:k6": "./scripts/build_k6.sh",
     "obs:start": "docker compose up -d",
-    "obs:stop": "docker compose down -v",
+    "obs:stop": "docker compose stop",
+    "obs:down": "docker compose down",
+    "obs:destroy": "docker compose down -v",
     "test:load": "K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9091/api/v1/write ./bin/k6 run --out experimental-prometheus-rw tests/load/index.ts"
   },
   "devDependencies": {

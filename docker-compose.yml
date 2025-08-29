@@ -8,6 +8,7 @@ services:
       - --web.enable-remote-write-receiver
     volumes:
       - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
     ports:
       - "9091:9090"
     networks:
@@ -20,6 +21,7 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
     ports:
       - "3300:3000"
     depends_on:
@@ -34,6 +36,7 @@ services:
     command: -config.file=/etc/loki/config.yml
     volumes:
       - ./observability/loki/config.yml:/etc/loki/config.yml:ro
+      - loki-data:/loki
     ports:
       - "33100:3100"
     networks:
@@ -47,6 +50,7 @@ services:
       - /var/log:/var/log
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
+      - promtail-data:/tmp
     networks:
       - observability
     depends_on:
@@ -57,6 +61,7 @@ services:
     command: -config.file=/etc/tempo/config.yml
     volumes:
       - ./observability/tempo/config.yml:/etc/tempo/config.yml:ro
+      - tempo-data:/tmp/tempo
     ports:
       - "33200:3200"
       - "24317:4317"
@@ -66,5 +71,12 @@ services:
 
 networks:
   observability:
+
+volumes:
+  grafana-data:
+  prometheus-data:
+  loki-data:
+  promtail-data:
+  tempo-data:
 
 
