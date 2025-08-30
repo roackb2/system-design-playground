@@ -61,7 +61,7 @@ services:
     command: -config.file=/etc/tempo/config.yml
     volumes:
       - ./observability/tempo/config.yml:/etc/tempo/config.yml:ro
-      - tempo-data:/tmp/tempo
+      - tempo-data:/var/tempo
     ports:
       - "33200:3200"
       - "24317:4317"
