@@ -37,9 +37,13 @@ graph TD
     end
 ```
 
-## Local playground stack (this repo)
+## Local playground stacks (this repo)
 
-The local setup is a single-node stack for experimentation. We use Prometheus (metrics), Loki (logs), Tempo (traces), Promtail (log shipper), and Grafana. k6 writes metrics directly to Prometheus via remote write.
+This repo supports two single-node stacks for experimentation: LGTM and ELK. You can run either one independently.
+
+### LGTM (Loki, Grafana, Tempo, Prometheus)
+
+We use Prometheus (metrics), Loki (logs), Tempo (traces), Promtail (log shipper), and Grafana. k6 writes metrics directly to Prometheus via remote write.
 
 ```mermaid
 graph TD
@@ -66,18 +70,52 @@ graph TD
 
 ### Persistence
 
-- Prometheus: `prometheus-data` → `/prometheus`
-- Grafana: `grafana-data` → `/var/lib/grafana`
-- Loki: `loki-data` → `/loki`
-- Promtail: `promtail-data` → `/tmp` (positions)
-- Tempo: `tempo-data` → `/var/tempo`
+- Prometheus: `prometheus-data-lgtm` → `/prometheus`
+- Grafana: `grafana-data-lgtm` → `/var/lib/grafana`
+- Loki: `loki-data-lgtm` → `/loki`
+- Promtail: `promtail-data-lgtm` → `/tmp` (positions)
+- Tempo: `tempo-data-lgtm` → `/var/tempo`
 
 ### Commands
 
-- Start: `npm run obs:start`
-- Stop (keep data): `npm run obs:stop`
-- Down (keep volumes): `npm run obs:down`
-- Destroy (wipe volumes): `npm run obs:destroy`
+- Start: `npm run obs:lgtm:start`
+- Stop (keep data): `npm run obs:lgtm:stop`
+- Down (keep volumes): `npm run obs:lgtm:down`
+- Destroy (wipe volumes): `npm run obs:lgtm:destroy`
 - Run k6 test: `npm run test:load`
+
+### ELK (Elasticsearch, Logstash, Kibana) + Filebeat
+
+ELK is a popular stack with abundant online resources. Filebeat ships Docker container logs to Logstash, which forwards to Elasticsearch. Kibana provides visualization.
+
+```mermaid
+graph TD
+    subgraph "Local Playground (single-node ELK)"
+        Docker["Docker containers (stdout)"] -->|harvest| Filebeat[Filebeat]
+        Filebeat -->|Beats| Logstash[Logstash]
+        Logstash -->|bulk index| ES[Elasticsearch]
+    end
+
+    subgraph "Visualization"
+        Kibana(Kibana) --> ES
+    end
+```
+
+### Ports (host → container)
+
+- Elasticsearch: 9200 → 9200
+- Kibana: 5601 → 5601
+- Logstash Beats input: 5044 → 5044
+
+### Persistence
+
+- Elasticsearch data: `es-data-elk` → `/usr/share/elasticsearch/data`
+
+### Commands
+
+- Start: `npm run obs:elk:start`
+- Stop (keep data): `npm run obs:elk:stop`
+- Down (keep volumes): `npm run obs:elk:down`
+- Destroy (wipe volumes): `npm run obs:elk:destroy`
 
 
