@@ -11,10 +11,47 @@ filebeat.autodiscover:
               paths:
                 - /var/lib/docker/containers/*/*.log
 
+# Harvest local app logs written by pino (mounted as /host-logs)
+filebeat.inputs:
+  - type: filestream
+    id: app-json-log
+    enabled: true
+    paths:
+      - /host-logs/app.json
+    parsers:
+      - ndjson:
+          target: "json"
+          overwrite_keys: true
+    fields:
+      dataset: app
+      project: system-design-playground
+      source: application
+      service.name: system-design-playground-app
+    fields_under_root: true
+    processors:
+      - timestamp:
+          field: json.time
+          layouts:
+            - UNIX_MS
+          test:
+            - "1735689600000"
+
 processors:
   - add_docker_metadata: ~
+  - if:
+      not:
+        equals:
+          dataset: "app"
+    then:
+      - add_fields:
+          target: ""
+          fields:
+            project: system-design-playground
+            source: stack
 
 output.logstash:
   hosts: ["logstash:5044"]
+
+logging.level: info
 
 

@@ -54,6 +54,7 @@ services:
       - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
+      - ../../../logs:/host-logs:ro # application logs on host machine
     networks:
       - observability-elk
 

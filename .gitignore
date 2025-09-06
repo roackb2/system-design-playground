@@ -1,12 +1,16 @@
+# Common ignores
 node_modules
 dist
 local/*
 
+# Environment variables
 .env
 .env.*
 !.env.example
 
+# built binaries
 k6
 
-
+# Local files
 local/*
+logs/*
