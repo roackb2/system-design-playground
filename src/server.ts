@@ -11,7 +11,7 @@ const runServer = async () => {
     const redisClient = await initRedis();
     const queue = new RedisQueueAdapter(redisClient);
     const mainApp = getMainApp({ queue })
-    logger.info(`Server listening on ${port}`)
+    logger.info(`Server listening on http://localhost:${port}`)
     mainApp.listen(port);
   } catch (err: unknown) {
     logger.error(`Error running server: ${err}`)
