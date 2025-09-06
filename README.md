@@ -83,6 +83,28 @@ npm run obs:elk:destroy
 - Kibana: http://localhost:5601
 - Elasticsearch: http://localhost:9200
 
+#### Application logs → ELK pipeline (local dev)
+
+- App logging: `pino` writes newline-delimited JSON to `logs/app.json` and stdout
+- Mount: Filebeat service mounts repo `logs/` to container path `/host-logs`
+- Filebeat: reads `/host-logs/app.json` as NDJSON and ships to Logstash
+- Logstash: normalizes to ECS (`message`, `log.level`, `process.pid`, `host.hostname`)
+- Labels added for easy filtering: `project=system-design-playground`, `source=application|stack`, `service.name=system-design-playground-app`
+
+Key files:
+- [observability/stacks/elk/docker-compose.elk.yml](observability/stacks/elk/docker-compose.elk.yml)
+- [observability/stacks/elk/filebeat/filebeat.yml](observability/stacks/elk/filebeat/filebeat.yml)
+- [observability/stacks/elk/logstash/pipeline/logstash.conf](observability/stacks/elk/logstash/pipeline/logstash.conf)
+- [src/lib/logger.ts](src/lib/logger.ts)
+
+Kibana setup:
+- Stack Management → Data views → New
+  - Index pattern: `logs-*`
+  - Timestamp field: `@timestamp`
+- Discover filters:
+  - Application logs: `project:"system-design-playground" AND source:"application"`
+  - Stack logs: `project:"system-design-playground" AND source:"stack"`
+
 ## Project layout
 
 - `src/` — services, domains, workers, and infrastructure

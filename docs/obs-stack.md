@@ -118,4 +118,27 @@ graph TD
 - Down (keep volumes): `npm run obs:elk:down`
 - Destroy (wipe volumes): `npm run obs:elk:destroy`
 
+### Log pipeline (local app → ELK)
+
+- The Node app logs via `pino` to `stdout` and `logs/app.json` (NDJSON). See `src/lib/logger.ts`.
+- Docker compose for ELK mounts the repo `logs/` directory into Filebeat at `/host-logs`.
+- Filebeat config reads `/host-logs/app.json` with `filestream` + `ndjson` parser and sends to Logstash.
+- Logstash pipeline maps fields into ECS:
+  - `json.msg` → `message`
+  - `json.level` (pino numeric) → `log.level`
+  - `json.pid` → `process.pid`
+  - `json.hostname` → `host.hostname`
+- Labels added for filtering in Kibana:
+  - `project=system-design-playground`
+  - `source=application` for app logs; `source=stack` for container logs via autodiscover
+  - `service.name=system-design-playground-app`
+
+Create a Data View in Kibana:
+- Index pattern: `logs-*`
+- Timestamp: `@timestamp`
+
+Useful Discover queries:
+- Application: `project:"system-design-playground" AND source:"application"`
+- Stack: `project:"system-design-playground" AND source:"stack"`
+
 
