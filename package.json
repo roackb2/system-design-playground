@@ -22,6 +22,14 @@
     "obs:stop": "docker compose stop",
     "obs:down": "docker compose down",
     "obs:destroy": "docker compose down -v",
+    "obs:lgtm:start": "docker compose -f observability/stacks/lgtm/docker-compose.lgtm.yml up -d",
+    "obs:lgtm:stop": "docker compose -f observability/stacks/lgtm/docker-compose.lgtm.yml stop",
+    "obs:lgtm:down": "docker compose -f observability/stacks/lgtm/docker-compose.lgtm.yml down",
+    "obs:lgtm:destroy": "docker compose -f observability/stacks/lgtm/docker-compose.lgtm.yml down -v",
+    "obs:elk:start": "docker compose -f observability/stacks/elk/docker-compose.elk.yml up -d",
+    "obs:elk:stop": "docker compose -f observability/stacks/elk/docker-compose.elk.yml stop",
+    "obs:elk:down": "docker compose -f observability/stacks/elk/docker-compose.elk.yml down",
+    "obs:elk:destroy": "docker compose -f observability/stacks/elk/docker-compose.elk.yml down -v",
     "test:load": "K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9091/api/v1/write ./bin/k6 run --out experimental-prometheus-rw tests/load/index.ts"
   },
   "devDependencies": {

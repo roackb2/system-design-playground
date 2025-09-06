@@ -1,0 +1,20 @@
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+      templates:
+        - condition:
+            contains:
+              docker.container.labels.com_docker_compose_project: system-design-playground
+          config:
+            - type: container
+              paths:
+                - /var/lib/docker/containers/*/*.log
+
+processors:
+  - add_docker_metadata: ~
+
+output.logstash:
+  hosts: ["logstash:5044"]
+
+
