@@ -11,6 +11,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "tsx watch src/server.ts | pino-pretty",
+    "dev:docker": "docker run -it --mount type=bind,source=.,target=/app --mount type=volume,source=node_modules,target=/app/node_modules system-design-playground",
     "build": "rm -rf dist && tsc",
     "start": "node dist/src/server.js",
     "typecheck": "tsc --noEmit",
