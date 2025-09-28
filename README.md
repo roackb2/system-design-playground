@@ -55,6 +55,72 @@ Start the app during development:
 yarn dev
 ```
 
+## Containerized local development (hot reload)
+
+This repo includes a lightweight dev image and run scripts that mount your source code for hot reload while keeping dependencies cached in a named Docker volume.
+
+### Build the dev image
+
+```bash
+yarn docker:build:dev
+```
+
+Key points from `dev.Dockerfile`:
+- Installs build tools once, installs deps via Yarn, and exposes port 3300.
+- Uses a dedicated volume for `node_modules` so host bind-mounts don’t clobber container deps.
+
+```1:12:/Users/roackb2/Studio/projects/Playground/system-design-playground/dev.Dockerfile
+FROM node:20-bullseye-slim
+WORKDIR /app
+ENV NODE_ENV=development
+ENV CHOKIDAR_USEPOLLING=true
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ \
+ && rm -rf /var/lib/apt/lists/*
+COPY package.json yarn.lock ./
+RUN corepack enable && yarn config set nodeLinker node-modules && yarn install
+VOLUME ["/app/node_modules"]
+EXPOSE 3300
+CMD ["yarn","dev"]
+```
+
+### Run the API with hot reload
+
+```bash
+yarn dev:docker
+```
+
+What it does:
+- Binds repo root to `/app` so edits trigger `tsx watch` hot reload.
+- Mounts a named volume at `/app/node_modules` to cache deps across runs.
+
+If you run Redis/Postgres on your host, use Docker’s host alias in envs:
+- Redis: set `REDIS_URL=redis://host.docker.internal:6379`
+- Postgres: set `DATABASE_URL=postgres://USER:PASS@host.docker.internal:5432/DBNAME`
+
+You can pass these to `docker run` or export them and reference in your scripts.
+
+### Run the onboarding worker in a container
+
+```bash
+yarn dev:docker:worker:onboarding
+```
+
+This mirrors the API container settings and uses the same mounts and envs.
+
+### Dependency caching behavior
+
+- `node_modules` is stored in the named volume `system-design-playground_node_modules`.
+- The first run seeds it from the image; subsequent runs reuse it (fast startup).
+- When `yarn.lock` changes, rebuild the image to capture new deps:
+  ```bash
+  yarn docker:build:dev
+  ```
+- To force a clean install without rebuilding, remove the volume:
+  ```bash
+  docker volume rm system-design-playground_node_modules
+  ```
+
 ## Observability
 
 See [docs/obs-stack.md](docs/obs-stack.md) for diagrams and details. Short commands:
