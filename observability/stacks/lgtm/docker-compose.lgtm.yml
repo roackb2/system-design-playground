@@ -10,7 +10,7 @@ services:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data-lgtm:/prometheus
     ports:
-      - "9091:9090"
+      - "9092:9090"
     networks:
       - observability-lgtm
 

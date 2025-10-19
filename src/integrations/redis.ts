@@ -17,7 +17,13 @@ export const initRedis = async () => {
   }
   logger.info(`Initializing redis with config: ${JSON.stringify(options, null, 2)}`)
   const redisClient = redisClientFactory(options);
-  redisClient.on("error", (err: unknown) => logger.error("Redis Client Error", err))
+  redisClient.on("error", (err: unknown) => {
+    logger.error("Redis Client Error:", err);
+    if (err instanceof Error) {
+      logger.error(`Error message: ${err.message}`);
+      logger.error(`Error stack: ${err.stack}`);
+    }
+  })
 
   await redisClient.connect();
 

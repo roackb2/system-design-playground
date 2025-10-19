@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.14.0
@@ -18,7 +16,7 @@ services:
       - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
       - es-data-elk:/usr/share/elasticsearch/data
     ports:
-      - "9200:9200"
+      - "9201:9200"
     networks:
       - observability-elk
 
@@ -29,7 +27,7 @@ services:
     volumes:
       - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
     ports:
-      - "5601:5601"
+      - "5602:5601"
     networks:
       - observability-elk
 
