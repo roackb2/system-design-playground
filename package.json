@@ -12,7 +12,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts | pino-pretty",
     "docker:build:dev": "docker build -f dev.Dockerfile -t system-design-playground:dev .",
-    "docker:run:dev": "docker run --name sdp-dev --rm -it -p 3300:3300 --env PORT=3300 --env CHOKIDAR_USEPOLLING=true --mount type=bind,source=$(pwd),target=/app --mount type=volume,source=system-design-playground_node_modules,target=/app/node_modules system-design-playground:dev",
+    "docker:run:dev": "docker run --name sdp-dev --rm -it -p 3301:3301 --env PORT=3301 --env CHOKIDAR_USEPOLLING=true --mount type=bind,source=$(pwd),target=/app --mount type=volume,source=system-design-playground_node_modules,target=/app/node_modules system-design-playground:dev",
     "docker:run:worker:onboarding:dev": "docker run --name sdp-worker-dev --rm -it --env CHOKIDAR_USEPOLLING=true --mount type=bind,source=$(pwd),target=/app --mount type=volume,source=system-design-playground_node_modules,target=/app/node_modules system-design-playground:dev yarn worker:onboarding:dev",
     "dev:docker": "yarn docker:build:dev && yarn docker:run:dev",
     "dev:docker:worker:onboarding": "yarn docker:build:dev && yarn docker:run:worker:onboarding:dev",
